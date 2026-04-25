@@ -32,6 +32,6 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/build-esm.mjs",
-    "test": "k6 run tests/self-test.k6.ts"
+    "test": "k6 run __tests__/self-test.k6.ts"
   }
 }

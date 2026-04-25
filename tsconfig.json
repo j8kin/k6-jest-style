@@ -6,7 +6,12 @@
     "strict": true,
     "noEmit": true,
     "allowImportingTsExtensions": true,
-    "types": ["k6"]
+    "types": [
+      "k6"
+    ]
   },
-  "include": ["src", "tests"]
+  "include": [
+    "src",
+    "__tests__"
+  ]
 }
