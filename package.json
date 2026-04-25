@@ -1,6 +1,6 @@
 {
   "name": "k6-jest-style",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Jest-style describe/test/beforeEach API for k6",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
