@@ -1,0 +1,60 @@
+name: Create Release
+
+on:
+  pull_request:
+    types: [ closed ]
+    branches:
+      - release
+
+jobs:
+  tag-release:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: release
+          fetch-depth: 0
+
+      - name: Read version
+        id: version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Create and push git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Generate release notes
+        id: release-notes
+        run: |
+          # Get the previous tag
+          previous_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$previous_tag" ]; then
+            # First release - include all commits
+            notes=$(git log --pretty=format:"- %h: %s" | head -20)
+          else
+            # Generate changelog between previous tag and current
+            notes=$(git log ${previous_tag}..HEAD --pretty=format:"- %h: %s")
+          fi
+
+          # Save notes to file for multiline output
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$notes" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            --target release \
+            --title "Release v${{ steps.version.outputs.version }}" \
+            --notes "${{ steps.release-notes.outputs.notes }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

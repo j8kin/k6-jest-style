@@ -1,0 +1,64 @@
+name: Bump Version and Create Release PR
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if PR already exists
+        id: check-pr
+        run: |
+          prs=$(gh pr list --base release --head master --json number -q '.[].number')
+          if [ -z "$prs" ]; then
+            echo "pr_exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "pr_exists=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump patch version
+        if: steps.check-pr.outputs.pr_exists == 'false'
+        id: bump
+        run: |
+          new_version=$(npm version patch --no-git-tag-version | sed 's/^v//')
+          echo "version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Commit and push version bump
+        if: steps.check-pr.outputs.pr_exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.version }} [skip ci]"
+          git push
+
+      - name: Generate GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+      - name: Create Pull Request
+        if: steps.check-pr.outputs.pr_exists == 'false'
+        run: |
+          gh pr create \
+            --base release \
+            --head master \
+            --title "chore: release ${{ steps.bump.outputs.version }}" \
+            --body "Automated release PR. Merge to release and tag a new version." \
+            --label release
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
