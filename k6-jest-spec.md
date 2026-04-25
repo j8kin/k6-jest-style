@@ -1,6 +1,6 @@
-# k6-jest — Specification
+# k6-jest-style — Specification
 
-> Working package name: `k6-jest`
+> Working package name: `k6-jest-style`
 > Purpose: Jest-style test authoring DSL for [k6](https://k6.io/), published to npmjs.
 
 ---
@@ -296,7 +296,7 @@ Separator is configurable (see §9).
 
 ```typescript
 // my-tests.k6.ts
-import {describe, beforeEach, afterEach, test, suiteOptions} from 'k6-jest';
+import {describe, beforeEach, afterEach, test, suiteOptions} from 'k6-jest-style';
 
 const suite = describe('My Feature', () => {
     // ... tests
@@ -401,7 +401,7 @@ pops it when the callback returns.
 A global config object can be set once before `describe()` calls:
 
 ```typescript
-import {configure} from 'k6-jest';
+import {configure} from 'k6-jest-style';
 
 configure({
     nameSeparator: ' > ',      // default: ' > '
@@ -458,7 +458,7 @@ order. The total `testCount` is the sum of all children.
 ## 11. Package Structure
 
 ```
-k6-jest/
+k6-jest-style/
 ├── src/
 │   ├── index.ts           # public re-exports
 │   ├── context.ts         # module-level context stack
@@ -483,7 +483,7 @@ k6-jest/
 
 ```json
 {
-  "name": "k6-jest",
+  "name": "k6-jest-style",
   "version": "0.1.0",
   "description": "Jest-style describe/test/beforeEach API for k6",
   "main": "dist/index.js",
@@ -552,7 +552,7 @@ k6-jest/
 ### 12.1 Basic usage
 
 ```typescript
-import {describe, beforeEach, afterEach, test, suiteOptions} from 'k6-jest';
+import {describe, beforeEach, afterEach, test, suiteOptions} from 'k6-jest-style';
 import http from 'k6/http';
 import {check} from 'k6';
 
@@ -627,7 +627,7 @@ describe.skip('Whole feature Y (blocked by JIRA-123)', () => {
 ### 12.4 Multiple suites (recommended for large test files)
 
 ```typescript
-import {mergeSuites, suiteOptions} from 'k6-jest';
+import {mergeSuites, suiteOptions} from 'k6-jest-style';
 import {authSuite} from './suites/auth.ts';
 import {productSuite} from './suites/products.ts';
 
@@ -755,18 +755,18 @@ async function safeRun(fn: TestFn): Promise<{ ok: boolean; error?: string }> {
 
 - Semantic versioning: `0.x.y` while API is stabilising, `1.0.0` once API is locked
 - Changelog maintained in `CHANGELOG.md`
-- Distributed on npmjs as `k6-jest` (confirm name availability before publish)
+- Distributed on npmjs as `k6-jest-style` (confirm name availability before publish)
 - CI: self-test suite in `tests/self-test.k6.ts` run against a real k6 binary on every PR
 
 ---
 
 ## 16. Open Questions (to resolve before implementation)
 
-1. **Package name**: `k6-jest` vs `@your-scope/k6-jest` vs `k6-describe` — check npmjs availability.
+1. **Package name**: `k6-jest-style` vs `@your-scope/k6-jest-style` vs `k6-describe` — check npmjs availability.
 2. **Build output format**: k6 can import ESM directly; CJS is needed only for bundler tooling. Confirm whether
    consumers will import via k6 native import or via a bundler (webpack/esbuild).
 3. **`afterEach` on hook failure**: If `beforeEach` fails, should `afterEach` always run (Jest default) or be skipped?
    Proposed: always run (safer for cleanup), configurable via `configure({ runAfterEachOnHookFailure: true })`
 4. **Report integration**: Should the library optionally emit Allure-compatible metadata (labels, steps) when xk6-allure
-   is detected? Proposed: separate optional plugin `k6-jest-allure` to keep core dependency-free.
+   is detected? Proposed: separate optional plugin `k6-jest-style-allure` to keep core dependency-free.
 5. **`test.todo`**: Add `test.todo(name)` as a no-fn variant that appears in report output? Low-effort, high-visibility.

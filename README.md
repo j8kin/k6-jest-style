@@ -4,7 +4,7 @@ Jest-style `describe / test / beforeEach / afterEach` syntax for [k6](https://k6
 dependencies beyond k6 built-ins. TypeScript-first.
 
 ```typescript
-import { describe, beforeEach, afterEach, test, suiteOptions } from 'k6-jest';
+import { describe, beforeEach, afterEach, test, suiteOptions } from 'k6-jest-style';
 import http from 'k6/http';
 import { check } from 'k6';
 
@@ -42,17 +42,17 @@ export default async function () {
 ## Installation
 
 ```bash
-npm install k6-jest
+yarn install k6-jest-style
 ```
 
 Import in your k6 script:
 
 ```typescript
 // ESM (k6 native)
-import { describe, test, suiteOptions } from 'k6-jest';
+import { describe, test, suiteOptions } from 'k6-jest-style';
 
 // CommonJS (bundler / webpack)
-const { describe, test, suiteOptions } = require('k6-jest');
+const { describe, test, suiteOptions } = require('k6-jest-style');
 ```
 
 ## API
@@ -164,7 +164,7 @@ export default async function () {
 Must be called **before** any `describe()` call. Calling it inside `describe` or `run()` is a no-op and logs a warning.
 
 ```typescript
-import { configure } from 'k6-jest';
+import { configure } from 'k6-jest-style';
 
 configure({
   nameSeparator: ' > ', // default: ' > '
@@ -236,9 +236,9 @@ The separator (`>`) is configurable via `configure({ nameSeparator })`.
 
 ## Execution model
 
-k6 evaluates scripts in two phases. `k6-jest` is designed around this constraint:
+k6 evaluates scripts in two phases. `k6-jest-style` is designed around this constraint:
 
-| Phase                | When                   | What k6-jest does                             |
+| Phase                | When                   | What k6-jest-style does                       |
 | -------------------- | ---------------------- | --------------------------------------------- |
 | **Init context**     | Once per VU at startup | `describe()` builds the `SuiteNode` tree      |
 | **Default function** | Once per VU iteration  | `suite.run()` traverses and executes the tree |
