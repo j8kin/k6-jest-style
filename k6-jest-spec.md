@@ -1,6 +1,6 @@
-# k6-jest-style — Specification
+# k6-test-jest-style — Specification
 
-> Working package name: `k6-jest-style`
+> Working package name: `k6-test-jest-style`
 > Purpose: Jest-style test authoring DSL for [k6](https://k6.io/), published to npmjs.
 
 ---
@@ -161,9 +161,9 @@ void
 ```typescript
 // Returned by describe()
 interface TestSuite {
-    readonly name: string;
-    readonly testCount: number;          // total non-skipped test leaf count
-    run(): Promise<void>;                // call inside k6 default export function
+  readonly name: string;
+  readonly testCount: number; // total non-skipped test leaf count
+  run(): Promise<void>; // call inside k6 default export function
 }
 ```
 
@@ -171,10 +171,10 @@ interface TestSuite {
 
 ```typescript
 // Convenience re-export: builds k6 `options` for sequential smoke execution
-function suiteOptions(suite: TestSuite, overrides?: Partial<Options>): Options
+function suiteOptions(suite: TestSuite, overrides?: Partial<Options>): Options;
 
 // Convenience re-export: wraps multiple suites into one runner
-function mergeSuites(...suites: TestSuite[]): TestSuite
+function mergeSuites(...suites: TestSuite[]): TestSuite;
 ```
 
 `suiteOptions` produces:
@@ -184,9 +184,7 @@ function mergeSuites(...suites: TestSuite[]): TestSuite
   "vus": 1,
   "iterations": 1,
   "thresholds": {
-    "checks": [
-      "rate==1.0"
-    ]
+    "checks": ["rate==1.0"]
   }
 }
 ```
@@ -204,42 +202,42 @@ export type HookFn = () => void | Promise<void>;
 export type TestFn = () => void | Promise<void>;
 
 export interface TestSuite {
-    readonly name: string;
-    readonly testCount: number;
+  readonly name: string;
+  readonly testCount: number;
 
-    run(): Promise<void>;
+  run(): Promise<void>;
 }
 
 export interface DescribeFn {
-    (name: string, fn: () => void): TestSuite;
+  (name: string, fn: () => void): TestSuite;
 
-    skip: (name: string, fn: () => void) => TestSuite;
+  skip: (name: string, fn: () => void) => TestSuite;
 }
 
 export interface TestFnWithModifiers {
-    (name: string, fn: TestFn): void;
+  (name: string, fn: TestFn): void;
 
-    skip: (name: string, fn: TestFn) => void;
-    only: (name: string, fn: TestFn) => void;
+  skip: (name: string, fn: TestFn) => void;
+  only: (name: string, fn: TestFn) => void;
 }
 
 // Internal tree node — not exported
 interface SuiteNode {
-    name: string;
-    skipped: boolean;
-    beforeAll: HookFn[];
-    afterAll: HookFn[];
-    beforeEach: HookFn[];
-    afterEach: HookFn[];
-    tests: TestNode[];
-    children: SuiteNode[];
+  name: string;
+  skipped: boolean;
+  beforeAll: HookFn[];
+  afterAll: HookFn[];
+  beforeEach: HookFn[];
+  afterEach: HookFn[];
+  tests: TestNode[];
+  children: SuiteNode[];
 }
 
 interface TestNode {
-    name: string;
-    fn: TestFn;
-    skipped: boolean;
-    only: boolean;
+  name: string;
+  fn: TestFn;
+  skipped: boolean;
+  only: boolean;
 }
 ```
 
@@ -252,7 +250,7 @@ interface TestNode {
 k6 evaluates a script in two phases:
 
 | Phase                | When                   | Allowed operations                                        |
-|----------------------|------------------------|-----------------------------------------------------------|
+| -------------------- | ---------------------- | --------------------------------------------------------- |
 | **Init context**     | Once per VU at startup | Module imports, variable declarations, `describe()` calls |
 | **Default function** | Once per VU iteration  | HTTP, checks, groups, assertions                          |
 
@@ -279,7 +277,7 @@ group(suite.name, async () => {
 via k6's `check()`:
 
 ```typescript
-check(null, {[testFullName]: () => result.ok});
+check(null, { [testFullName]: () => result.ok });
 ```
 
 ### 5.3 Full name construction
@@ -296,16 +294,16 @@ Separator is configurable (see §9).
 
 ```typescript
 // my-tests.k6.ts
-import {describe, beforeEach, afterEach, test, suiteOptions} from 'k6-jest-style';
+import { describe, beforeEach, afterEach, test, suiteOptions } from 'k6-test-jest-style';
 
 const suite = describe('My Feature', () => {
-    // ... tests
+  // ... tests
 });
 
 export const options = suiteOptions(suite);
 
 export default async function () {
-    await suite.run();
+  await suite.run();
 }
 ```
 
@@ -401,12 +399,12 @@ pops it when the callback returns.
 A global config object can be set once before `describe()` calls:
 
 ```typescript
-import {configure} from 'k6-jest-style';
+import { configure } from 'k6-test-jest-style';
 
 configure({
-    nameSeparator: ' > ',      // default: ' > '
-    continueOnHookFailure: true, // default: true
-    verbose: false,            // default: false — if true, logs each test start/end to console
+  nameSeparator: ' > ', // default: ' > '
+  continueOnHookFailure: true, // default: true
+  verbose: false, // default: false — if true, logs each test start/end to console
 });
 ```
 
@@ -458,7 +456,7 @@ order. The total `testCount` is the sum of all children.
 ## 11. Package Structure
 
 ```
-k6-jest-style/
+k6-test-jest-style/
 ├── src/
 │   ├── index.ts           # public re-exports
 │   ├── context.ts         # module-level context stack
@@ -483,7 +481,7 @@ k6-jest-style/
 
 ```json
 {
-  "name": "k6-jest-style",
+  "name": "k6-test-jest-style",
   "version": "0.1.0",
   "description": "Jest-style describe/test/beforeEach API for k6",
   "main": "dist/index.js",
@@ -496,16 +494,8 @@ k6-jest-style/
       "types": "./dist/index.d.ts"
     }
   },
-  "files": [
-    "dist"
-  ],
-  "keywords": [
-    "k6",
-    "testing",
-    "jest",
-    "describe",
-    "k6-lib"
-  ],
+  "files": ["dist"],
+  "keywords": ["k6", "testing", "jest", "describe", "k6-lib"],
   "peerDependencies": {
     "k6": "*"
   },
@@ -535,13 +525,9 @@ k6-jest-style/
     "outDir": "dist",
     "noEmit": false,
     "allowImportingTsExtensions": false,
-    "types": [
-      "k6"
-    ]
+    "types": ["k6"]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
 ```
 
@@ -552,37 +538,37 @@ k6-jest-style/
 ### 12.1 Basic usage
 
 ```typescript
-import {describe, beforeEach, afterEach, test, suiteOptions} from 'k6-jest-style';
+import { describe, beforeEach, afterEach, test, suiteOptions } from 'k6-test-jest-style';
 import http from 'k6/http';
-import {check} from 'k6';
+import { check } from 'k6';
 
 const suite = describe('Users API', () => {
-    let userId: string;
+  let userId: string;
 
-    beforeEach(() => {
-        const res = http.post('https://api.example.com/users', JSON.stringify({name: 'test'}));
-        userId = JSON.parse(res.body as string).id;
-    });
+  beforeEach(() => {
+    const res = http.post('https://api.example.com/users', JSON.stringify({ name: 'test' }));
+    userId = JSON.parse(res.body as string).id;
+  });
 
-    afterEach(() => {
-        http.del(`https://api.example.com/users/${userId}`);
-    });
+  afterEach(() => {
+    http.del(`https://api.example.com/users/${userId}`);
+  });
 
-    test('GET /users/:id returns 200', () => {
-        const res = http.get(`https://api.example.com/users/${userId}`);
-        check(res, {'status is 200': (r) => r.status === 200});
-    });
+  test('GET /users/:id returns 200', () => {
+    const res = http.get(`https://api.example.com/users/${userId}`);
+    check(res, { 'status is 200': (r) => r.status === 200 });
+  });
 
-    test('GET /users/:id returns correct body', () => {
-        const res = http.get(`https://api.example.com/users/${userId}`);
-        const body = JSON.parse(res.body as string);
-        check(res, {'name matches': () => body.name === 'test'});
-    });
+  test('GET /users/:id returns correct body', () => {
+    const res = http.get(`https://api.example.com/users/${userId}`);
+    const body = JSON.parse(res.body as string);
+    check(res, { 'name matches': () => body.name === 'test' });
+  });
 });
 
 export const options = suiteOptions(suite);
 export default async function () {
-    await suite.run();
+  await suite.run();
 }
 ```
 
@@ -627,15 +613,15 @@ describe.skip('Whole feature Y (blocked by JIRA-123)', () => {
 ### 12.4 Multiple suites (recommended for large test files)
 
 ```typescript
-import {mergeSuites, suiteOptions} from 'k6-jest-style';
-import {authSuite} from './suites/auth.ts';
-import {productSuite} from './suites/products.ts';
+import { mergeSuites, suiteOptions } from 'k6-test-jest-style';
+import { authSuite } from './suites/auth.ts';
+import { productSuite } from './suites/products.ts';
 
 const all = mergeSuites(authSuite, productSuite);
 
 export const options = suiteOptions(all);
 export default async function () {
-    await all.run();
+  await all.run();
 }
 ```
 
@@ -663,7 +649,7 @@ describe('DB tests', () => {
 ## 13. Constraints and Limitations
 
 | Constraint                                  | Reason                                                              |
-|---------------------------------------------|---------------------------------------------------------------------|
+| ------------------------------------------- | ------------------------------------------------------------------- |
 | No `expect()` API                           | Out of scope for v1; use k6's `check()`                             |
 | No module mocking                           | k6 runtime does not support it                                      |
 | No parallelism between tests                | By design: 1 VU, sequential. k6 multi-VU is for load, not isolation |
@@ -686,17 +672,16 @@ A module-level singleton holds the collection state:
 const _stack: SuiteNode[] = [];
 
 export function pushSuite(node: SuiteNode) {
-    _stack.push(node);
+  _stack.push(node);
 }
 
 export function popSuite() {
-    _stack.pop();
+  _stack.pop();
 }
 
 export function currentSuite(): SuiteNode {
-    if (_stack.length === 0)
-        throw new Error('beforeEach/afterEach/test must be called inside a describe() callback');
-    return _stack[_stack.length - 1];
+  if (_stack.length === 0) throw new Error('beforeEach/afterEach/test must be called inside a describe() callback');
+  return _stack[_stack.length - 1];
 }
 ```
 
@@ -706,32 +691,28 @@ export function currentSuite(): SuiteNode {
 hooks as it descends:
 
 ```typescript
-async function runSuite(
-    node: SuiteNode,
-    inheritedBeforeEach: HookFn[],
-    inheritedAfterEach: HookFn[],
-) {
-    const allBeforeEach = [...inheritedBeforeEach, ...node.beforeEach];
-    const allAfterEach = [...node.afterEach, ...inheritedAfterEach];  // reversed
+async function runSuite(node: SuiteNode, inheritedBeforeEach: HookFn[], inheritedAfterEach: HookFn[]) {
+  const allBeforeEach = [...inheritedBeforeEach, ...node.beforeEach];
+  const allAfterEach = [...node.afterEach, ...inheritedAfterEach]; // reversed
 
-    await group(node.name, async () => {
-        await runHooks(node.beforeAll);
-        const tests = resolveOnly(node.tests);
-        for (const t of tests) {
-            if (t.skipped) {
-                reportSkipped(t.name);
-                continue;
-            }
-            await runHooks(allBeforeEach);
-            const result = await safeRun(t.fn);
-            await runHooks(allAfterEach);
-            check(null, {[fullName(node, t)]: () => result.ok});
-        }
-        for (const child of node.children) {
-            await runSuite(child, allBeforeEach, allAfterEach);
-        }
-        await runHooks(node.afterAll);
-    });
+  await group(node.name, async () => {
+    await runHooks(node.beforeAll);
+    const tests = resolveOnly(node.tests);
+    for (const t of tests) {
+      if (t.skipped) {
+        reportSkipped(t.name);
+        continue;
+      }
+      await runHooks(allBeforeEach);
+      const result = await safeRun(t.fn);
+      await runHooks(allAfterEach);
+      check(null, { [fullName(node, t)]: () => result.ok });
+    }
+    for (const child of node.children) {
+      await runSuite(child, allBeforeEach, allAfterEach);
+    }
+    await runHooks(node.afterAll);
+  });
 }
 ```
 
@@ -739,13 +720,13 @@ async function runSuite(
 
 ```typescript
 async function safeRun(fn: TestFn): Promise<{ ok: boolean; error?: string }> {
-    try {
-        await fn();
-        return {ok: true};
-    } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        return {ok: false, error: msg};
-    }
+  try {
+    await fn();
+    return { ok: true };
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { ok: false, error: msg };
+  }
 }
 ```
 
@@ -755,18 +736,18 @@ async function safeRun(fn: TestFn): Promise<{ ok: boolean; error?: string }> {
 
 - Semantic versioning: `0.x.y` while API is stabilising, `1.0.0` once API is locked
 - Changelog maintained in `CHANGELOG.md`
-- Distributed on npmjs as `k6-jest-style` (confirm name availability before publish)
+- Distributed on npmjs as `k6-test-jest-style` (confirm name availability before publish)
 - CI: self-test suite in `tests/self-test.k6.ts` run against a real k6 binary on every PR
 
 ---
 
 ## 16. Open Questions (to resolve before implementation)
 
-1. **Package name**: `k6-jest-style` vs `@your-scope/k6-jest-style` vs `k6-describe` — check npmjs availability.
+1. **Package name**: `k6-test-jest-style` vs `@your-scope/k6-test-jest-style` vs `k6-describe` — check npmjs availability.
 2. **Build output format**: k6 can import ESM directly; CJS is needed only for bundler tooling. Confirm whether
    consumers will import via k6 native import or via a bundler (webpack/esbuild).
 3. **`afterEach` on hook failure**: If `beforeEach` fails, should `afterEach` always run (Jest default) or be skipped?
    Proposed: always run (safer for cleanup), configurable via `configure({ runAfterEachOnHookFailure: true })`
 4. **Report integration**: Should the library optionally emit Allure-compatible metadata (labels, steps) when xk6-allure
-   is detected? Proposed: separate optional plugin `k6-jest-style-allure` to keep core dependency-free.
+   is detected? Proposed: separate optional plugin `k6-test-jest-style-allure` to keep core dependency-free.
 5. **`test.todo`**: Add `test.todo(name)` as a no-fn variant that appears in report output? Low-effort, high-visibility.
