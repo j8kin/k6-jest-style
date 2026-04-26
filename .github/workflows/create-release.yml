@@ -24,31 +24,27 @@ jobs:
           version=$(node -p "require('./package.json').version")
           echo "version=$version" >> $GITHUB_OUTPUT
 
+      - name: Generate release notes
+        id: release-notes
+        run: |
+          previous_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$previous_tag" ]; then
+            notes=$(git log --pretty=format:"- %h: %s" | head -20)
+          else
+            notes=$(git log ${previous_tag}..HEAD --pretty=format:"- %h: %s")
+          fi
+
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$notes" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create and push git tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag "v${{ steps.version.outputs.version }}"
           git push origin "v${{ steps.version.outputs.version }}"
-
-      - name: Generate release notes
-        id: release-notes
-        run: |
-          # Get the previous tag
-          previous_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-
-          if [ -z "$previous_tag" ]; then
-            # First release - include all commits
-            notes=$(git log --pretty=format:"- %h: %s" | head -20)
-          else
-            # Generate changelog between previous tag and current
-            notes=$(git log ${previous_tag}..HEAD --pretty=format:"- %h: %s")
-          fi
-
-          # Save notes to file for multiline output
-          echo "notes<<EOF" >> $GITHUB_OUTPUT
-          echo "$notes" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         run: |
