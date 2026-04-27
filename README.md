@@ -253,6 +253,8 @@ async.
 - No parallelism between tests — sequential by design (1 VU); k6 multi-VU is for load, not test isolation
 - `describe()` must not be called inside `run()` or `export default`
 
+## Allure integration (TBD)
+
 ## Development
 
 ```bash
